@@ -46,7 +46,14 @@ getPackageFromRepo allCabalHashesPath mSha1Hash pkgId = do
     tarballSHA256 = fromMaybe
       (error (display pkgId ++ ": meta data has no SHA256 hash for the tarball"))
       (view (mHashes . at "SHA256") meta)
-    source = DerivationSource "url" ("mirror://hackage/" ++ display pkgId ++ ".tar.gz") "" tarballSHA256
+    source =
+      DerivationSource
+        { derivKind = "url"
+        , derivUrl = "mirror://hackage/" ++ display pkgId ++ ".tar.gz"
+        , derivRevision = ""
+        , derivHash = tarballSHA256
+        , derivSubmodule = Nothing
+        }
   return $ Package source False pkgDesc
 
 getPackageFromDb :: DB.HackageDB -> PackageIdentifier -> IO Package
